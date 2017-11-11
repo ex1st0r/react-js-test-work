@@ -1,0 +1,4 @@
+.chat-page__message-history {
+    overflow: scroll;
+    max-height: 500px;
+}
