@@ -27,21 +27,12 @@ export default function chat(state = initialState, action) {
                 authSuccess: null,
                 authError: null
             }
+
         case actions.PERFORM_AUTH_SUCCESS:
             return {
                 ...state,
                 authRequest: false,
                 authSuccess: true,
-                ownerId: action.payload.data.ownerId,
-                token: action.payload.data.token,
-                level: action.payload.data.level,
-            }
-
-        case actions.PERFORM_AUTH_FAILURE:
-            return {
-                ...state,
-                authRequest: false,
-                authError: action.payload.data
             }
 
         case actions.PERFORM_LOGOUT_REQUEST:

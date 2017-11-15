@@ -38,11 +38,9 @@ export const performAuthRequest = () => ({
  * Action dispatched in thunk "performAuth".
  *
  */
-export const performAuthSuccess = (response) => ({
+export const performAuthSuccess = () => ({
     type: PERFORM_AUTH_SUCCESS,
-    payload: {
-        data: response
-    }
+    payload: { }
 })
 
 /*

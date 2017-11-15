@@ -39,7 +39,7 @@ export const performSetAuthName = (name) => (dispatch, getState) => {
 /*
  * Thunk dispatched by "ChatPage" screen.  Thunk used to get new chat.
  */
-export const callGetNewChat = () => (dispatch, getState) => {
+export const callGetNewChat = (options) => (dispatch, getState) => {
     let state = getState()
     let reducerState = state.chat
 
@@ -48,7 +48,7 @@ export const callGetNewChat = () => (dispatch, getState) => {
 
     let io = new SocketManager()
 
-    return io.getNewChat({email: email, name: name})
+    io.getNewChat({email: email, name: name, callback: options.callback})
 
 }
 
@@ -75,11 +75,15 @@ export const performNavigateToAuthScreen = () => (dispatch, getState) => {
  */
 export const performNavigateToChatScreen = () => (dispatch, getState) => {
 
-    dispatch(thunks.callGetNewChat()).then(() => {
-        dispatch(thunks.callGetMessagesList())
+    dispatch(thunks.callGetNewChat({
+        callback: (data) => {
+            dispatch(actions.performAuthSuccess())
 
-        dispatch(thunks.performChangeScreen(Enums.AppPages.CHAT_PAGE))
-    })
+            dispatch(thunks.callGetMessagesList())
+
+            dispatch(thunks.performChangeScreen(Enums.AppPages.CHAT_PAGE))
+        }
+    }))
 
 }
 
@@ -94,12 +98,14 @@ export const callSendMessage = () => (dispatch, getState) => {
 
     let socket = new SocketManager()
 
-    socket.sendNewMessage({message}).then(() => {
-        // Clear input field after send message
-        dispatch(thunks.performSetChatInputText(''))
+    socket.sendNewMessage({
+        message,
+        callback: () => {
+            // Clear input field after send message
+            dispatch(thunks.performSetChatInputText(''))
 
-        dispatch(thunks.callGetMessagesList())
-    })
+            dispatch(thunks.callGetMessagesList())
+        }})
 }
 
 /*
@@ -113,11 +119,15 @@ export const performSetChatInputText = (text) => (dispatch, getState) => {
 /*
  * Thunk dispatched by "ChatPage" screen. Thunk call for get message list.
  */
-export const callGetMessagesList = (text) => (dispatch, getState) => {
+export const callGetMessagesList = () => (dispatch, getState) => {
     let state = getState()
     let reducerState = state.chat
 
     let socket = new SocketManager()
 
-    return socket.getChatMessages().then((msgList) => dispatch(actions.performSetChatMessagesList(msgList)))
+    socket.getChatMessages({
+        callback: (data) => {
+            dispatch(actions.performSetChatMessagesList(data.data))
+        }
+    })
 }
